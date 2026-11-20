@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-font="normal">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VIGIA-TI — Catálogo Integrado de Sistemas e Ativos de TI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="sbBackdrop" class="sidebar-backdrop"></div>
+  <div class="app-shell">
+    <!-- MENU LATERAL ESCURO EXECUTIVO (OPÇÃO B) -->
+    <aside class="sidebar" id="sidebar" aria-label="Menu lateral">
+      <div>
+        <div class="sb-brand">
+          <div class="sb-logo" aria-hidden="true">V-TI</div>
+          <div>
+            <h1>VIGIA-TI</h1>
+            <span>Catálogo de Sistemas e Ativos</span>
+          </div>
+        </div>
+
+        <div class="sb-section-label">Navegação Principal</div>
+        <nav id="mainNav" aria-label="Seções do sistema"></nav>
+      </div>
+
+      <div class="sb-footer">
+        <div class="sb-user-card">
+          <b id="usrNome">Victor Lima</b>
+          <small id="usrPerfil">Gestor de TI</small>
+        </div>
+        <button type="button" class="sb-btn" id="troca">
+          <i class="ph-duotone ph-user-switch ico" style="font-size:16px" aria-hidden="true"></i>
+          Trocar Perfil
+        </button>
+        <button type="button" class="sb-btn" id="btnReset">
+          <i class="ph-duotone ph-arrow-counter-clockwise ico" style="font-size:16px" aria-hidden="true"></i>
+          Restaurar Exemplo
+        </button>
+      </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL DE TRABALHO -->
+    <div class="workspace">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button type="button" id="btnMobileMenu" class="menu-toggle" aria-label="Abrir menu lateral">
+            <i class="ph-duotone ph-list ico" style="font-size:16px" aria-hidden="true"></i>
+            Menu
+          </button>
+          <div class="topbar-title">
+            <h2 id="pageTitle">Visão Geral</h2>
+            <p id="pageSub">Resumo de ferramentas, custos e oportunidades de economia</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="a11y-group" role="group" aria-label="Tamanho da letra">
+            <button type="button" data-fsize="normal" class="active" title="Letra normal">A</button>
+            <button type="button" data-fsize="large" title="Letra grande">A+</button>
+            <button type="button" data-fsize="xlarge" title="Letra extra grande">A++</button>
+          </div>
+          <button type="button" id="btnTheme" title="Alternar entre modo claro e escuro">Modo Escuro</button>
+          <button type="button" id="btnCsv" title="Baixar tabela em planilha Excel (CSV)">
+            <i class="ph-duotone ph-download-simple ico" style="font-size:16px" aria-hidden="true"></i>
+            Exportar CSV
+          </button>
+          <button type="button" onclick="window.print()" title="Imprimir ou salvar relatório em PDF">
+            <i class="ph-duotone ph-printer ico" style="font-size:16px" aria-hidden="true"></i>
+            Imprimir
+          </button>
+          <button type="button" class="p" id="novo">
+            <i class="ph-duotone ph-plus ico" style="font-size:16px" aria-hidden="true"></i>
+            Cadastrar
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <!-- SEÇÃO 1: VISÃO GERAL (ADAPTADA AO PERFIL LOGADO) -->
+        <section id="sec-painel" class="vw">
+          <!-- Bloco personalizado conforme qual dos 4 usuários está logado -->
+          <div id="roleSpotlight" class="role-spotlight"></div>
+
+          <div class="kpis kpis-3" id="kpis" aria-label="Indicadores principais"></div>
+
+          <div class="grid2">
+            <div class="box">
+              <div class="box-header">
+                <h3 class="h-ico"><i class="ph-duotone ph-buildings"></i>Custo anual por setor</h3>
+              </div>
+              <div id="porSetor"></div>
+            </div>
+            <div class="box">
+              <div class="box-header">
+                <h3 class="h-ico"><i class="ph-duotone ph-database"></i>Origem dos dados</h3>
+              </div>
+              <div id="porPapel"></div>
+            </div>
+            <div class="box">
+              <div class="box-header">
+                <h3 class="h-ico"><i class="ph-duotone ph-shield-warning"></i>Alertas de privacidade (LGPD)</h3>
+              </div>
+              <div id="resumoLgpdPainel"></div>
+            </div>
+            <div class="box">
+              <div class="box-header">
+                <h3 class="h-ico"><i class="ph-duotone ph-calendar-x"></i>Contratos próximos do vencimento</h3>
+              </div>
+              <div id="venc"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 2: CATÁLOGO DE SISTEMAS E VISÃO POR SETOR -->
+        <section id="sec-sistemas" class="vw" hidden>
+          <div class="tools" role="search" aria-label="Filtros do catálogo">
+            <input id="q" type="search" placeholder="Buscar por nome, setor, responsável ou fornecedor..." aria-label="Buscar">
+            <select id="fSetor" aria-label="Setor"></select>
+            <select id="fPapel" aria-label="Papel do Dado">
+              <option value="">Todas as origens</option>
+              <option value="Fonte Oficial (Base Principal)">Fontes Oficiais</option>
+              <option value="Cópia Paralela (Gera Inconsistência)">Cópias Paralelas</option>
+              <option value="Consulta Integrada">Consulta Integrada</option>
+            </select>
+            <select id="fSit" aria-label="Situação de uso"></select>
+            <select id="fGov" aria-label="Avaliação da TI"></select>
+            <select id="fRisco" aria-label="Risco LGPD">
+              <option value="">Qualquer risco LGPD</option>
+              <option value="Crítico">Risco Crítico</option>
+              <option value="Alto">Risco Alto</option>
+              <option value="Médio">Risco Médio</option>
+              <option value="Baixo">Risco Baixo</option>
+            </select>
+            <select id="fCat" aria-label="Categoria"></select>
+            <button type="button" id="btnLimparFiltros" title="Limpar todos os filtros">Limpar</button>
+          </div>
+
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th class="sortable" data-sort="nome">Ferramenta ↕</th>
+                  <th class="sortable" data-sort="setor">Setor ↕</th>
+                  <th>Origem e Uso</th>
+                  <th class="sortable" data-sort="risco">Risco LGPD ↕</th>
+                  <th class="num sortable" data-sort="tco">Custo Anual ↕</th>
+                  <th class="num">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="lista"></tbody>
+            </table>
+          </div>
+
+          <div class="box" style="margin-top:24px">
+            <div class="box-header">
+              <h3 class="h-ico"><i class="ph-duotone ph-users-three"></i>Ferramentas por setor</h3>
+            </div>
+            <div id="viewSetores"></div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 3: DUPLICIDADES, RETRABALHO E ECONOMIA -->
+        <section id="sec-sobreposicoes" class="vw" hidden>
+          <div class="box">
+            <div class="box-header">
+              <h3 class="h-ico"><i class="ph-duotone ph-calculator"></i>Simulador de economia</h3>
+            </div>
+            <div id="simuladorEco"></div>
+          </div>
+
+          <div class="box">
+            <div class="box-header">
+              <h3 class="h-ico"><i class="ph-duotone ph-copy"></i>Ferramentas duplicadas</h3>
+            </div>
+            <div id="ovl"></div>
+          </div>
+
+          <div class="box">
+            <div class="box-header">
+              <h3 class="h-ico"><i class="ph-duotone ph-git-merge"></i>Planos de unificação</h3>
+            </div>
+            <div id="listaPlanos"></div>
+          </div>
+
+          <div id="viewRelatorios"></div>
+        </section>
+
+        <!-- SEÇÃO 4: GOVERNANÇA, LGPD E MAPA DE CONEXÕES -->
+        <section id="sec-governanca" class="vw" hidden>
+          <div class="box">
+            <div class="box-header">
+              <h3 class="h-ico"><i class="ph-duotone ph-graph"></i>Mapa de conexões e ferramentas isoladas</h3>
+            </div>
+            <div id="mapa"></div>
+            <div id="integ" style="margin-top:12px"></div>
+          </div>
+
+          <div class="box">
+            <div class="box-header">
+              <h3 class="h-ico"><i class="ph-duotone ph-share-network"></i>Dispersão dos dados pela instituição</h3>
+            </div>
+            <div id="lgpdDispersao"></div>
+          </div>
+
+          <div class="box">
+            <div class="box-header">
+              <h3 class="h-ico"><i class="ph-duotone ph-hourglass-medium"></i>Aguardando avaliação da TI</h3>
+            </div>
+            <div id="govFila"></div>
+          </div>
+
+          <div class="box">
+            <div class="box-header">
+              <h3 class="h-ico"><i class="ph-duotone ph-lock-key"></i>Controles de segurança por ferramenta</h3>
+            </div>
+            <div id="lgpdMatriz"></div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 5: CONTRATOS E HISTÓRICO -->
+        <section id="sec-contratos" class="vw" hidden>
+          <div id="viewContratos"></div>
+
+          <div class="box" id="boxHistorico" style="margin-top:20px">
+            <div class="box-header">
+              <h3 class="h-ico"><i class="ph-duotone ph-clock-counter-clockwise"></i>Histórico de alterações</h3>
+            </div>
+            <div id="hist"></div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO 6: PAINEL ADMINISTRATIVO DE USUÁRIOS E NÍVEIS DE ACESSO -->
+        <section id="sec-acessos" class="vw" hidden>
+          <div class="kpis" id="adminKpis"></div>
+
+          <div class="box">
+            <div class="box-header">
+              <h3 class="h-ico"><i class="ph-duotone ph-users-three"></i>Usuários e solicitações de acesso</h3>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <div class="pill-tabs" id="userFilterTabs">
+                  <button type="button" class="pill-tab active" data-uf="todos">Todos</button>
+                  <button type="button" class="pill-tab" data-uf="pendente">Pendentes</button>
+                  <button type="button" class="pill-tab" data-uf="ativo">Ativos</button>
+                  <button type="button" class="pill-tab" data-uf="bloqueado">Bloqueados</button>
+                </div>
+                <button type="button" class="sm p" id="btnNovoUsuario">+ Novo Usuário</button>
+              </div>
+            </div>
+            <div class="tw" style="box-shadow:none;border:0">
+              <table style="min-width:700px">
+                <thead>
+                  <tr>
+                    <th>Usuário</th>
+                    <th>Setor</th>
+                    <th>Nível de Acesso (Perfil)</th>
+                    <th>Status</th>
+                    <th class="num">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="listaUsuarios"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="box-header">
+              <h3 class="h-ico"><i class="ph-duotone ph-shield-check"></i>Matriz de níveis de acesso por perfil</h3>
+            </div>
+            <p style="margin:0 0 12px;color:var(--mu);font-size:0.86rem">
+              Defina o que cada perfil pode executar na plataforma. As alterações entram em vigor imediatamente no banco de dados.
+            </p>
+            <div class="tw" style="box-shadow:none">
+              <table class="perm-table" style="min-width:740px">
+                <thead>
+                  <tr>
+                    <th>Perfil</th>
+                    <th>Cadastrar</th>
+                    <th>Editar Técnico</th>
+                    <th>Editar Custos</th>
+                    <th>Excluir</th>
+                    <th>Homologar TI</th>
+                    <th>Planos</th>
+                    <th>Auditoria</th>
+                    <th>Admin Acessos</th>
+                  </tr>
+                </thead>
+                <tbody id="listaPermissoes"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL: CADASTRO / EDIÇÃO DE SISTEMA -->
+  <dialog id="dlg">
+    <form id="frm" method="dialog">
+      <div class="modal-head">
+        <div>
+          <h2 id="dt" style="margin:0 0 4px;font-size:1.25rem">Cadastrar Ferramenta</h2>
+          <p style="margin:0;color:var(--tx-sec);font-size:0.88rem">Registre os dados do sistema ou planilha para compor o catálogo único da instituição.</p>
+        </div>
+        <button type="button" class="modal-close" onclick="this.closest('dialog').close()" aria-label="Fechar janela"><i class="ph-duotone ph-x"></i></button>
+      </div>
+
+      <fieldset>
+        <legend>1. Identificação, Setor e Papel do Dado</legend>
+        <div class="fg">
+          <label>Nome do Sistema ou Planilha *<input name="nome" required></label>
+          <label>Tipo de Ferramenta
+            <select name="tipo">
+              <option>Sistema</option>
+              <option>Planilha</option>
+              <option>Software</option>
+              <option>Equipamento</option>
+            </select>
+          </label>
+          <label>Categoria / Finalidade Principal *
+            <input name="categoria" list="cats" placeholder="Ex: Cadastro de estudantes, Eventos, Atividades administrativas" required>
+          </label>
+          <label>Papel dos Dados nesta Ferramenta *
+            <select name="papelDados">
+              <option>Fonte Oficial (Base Principal)</option>
+              <option>Cópia Paralela (Gera Inconsistência)</option>
+              <option>Consulta Integrada</option>
+            </select>
+          </label>
+          <label>Setor Responsável *<input name="setor" list="setores" required></label>
+          <label>Funcionário Responsável *<input name="responsavel" required></label>
+          <label>Situação Atual de Uso
+            <select name="situacao">
+              <option>Ativo</option>
+              <option>Em migração</option>
+              <option>Subutilizado</option>
+              <option>Obsoleto</option>
+              <option>Desativado</option>
+            </select>
+          </label>
+          <label>Avaliação da Área de TI
+            <select name="governanca">
+              <option>Homologado</option>
+              <option>Pendente de validação</option>
+              <option>Shadow IT (Não homologado)</option>
+              <option>Em descontinuação</option>
+            </select>
+          </label>
+        </div>
+        <div class="fg" style="margin-top:10px">
+          <label>Versão / Onde fica salvo<input name="versao" placeholder="Ex: 4.2, Excel na Rede, Google Drive"></label>
+          <label style="grid-column:span 2">Descrição da Finalidade<input name="finalidade" placeholder="Para que o setor usa esta ferramenta no dia a dia?"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>2. Custos Anuais e Calculadora de Retrabalho Manual</legend>
+        <div class="fg">
+          <label>Licenças Anuais (R$/ano)<input name="cLic" type="number" min="0" step="0.01" value="0"></label>
+          <label>Suporte Técnico (R$/ano)<input name="cSup" type="number" min="0" step="0.01" value="0"></label>
+          <label>Infraestrutura / Nuvem (R$/ano)<input name="cInf" type="number" min="0" step="0.01" value="0"></label>
+          <label>Horas/semana gastas redigitando dados
+            <input name="horasRetrabalhoSem" id="inpHorasSem" type="number" min="0" step="0.5" value="0">
+          </label>
+          <label>Custo Anual de Retrabalho (R$/ano)
+            <input name="cOut" id="inpCustoRetrab" type="number" min="0" step="0.01" value="0">
+          </label>
+        </div>
+        <small id="calcRetrabHint" style="display:block;margin-top:6px;color:var(--ac);font-weight:600">
+          Dica: Ao informar as horas semanais de redigitação, o sistema calcula automaticamente as horas perdidas por ano (48 semanas × R$ 32/h).
+        </small>
+      </fieldset>
+
+      <fieldset>
+        <legend>3. Usuários e Licenças</legend>
+        <div class="fg">
+          <label>Pessoas que utilizam<input name="usuariosEst" type="number" min="0" value="1"></label>
+          <label>Quem são os usuários?<input name="perfilUsuarios" placeholder="Ex: Secretaria, Coordenadores"></label>
+          <label>Licenças Pagas (Contratadas)<input name="licC" type="number" min="0" value="0"></label>
+          <label>Licenças Realmente em Uso<input name="licU" type="number" min="0" value="0"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>4. Dados Tratados e Segurança (LGPD)</legend>
+        <label>Quais tipos de dados passam por esta ferramenta?</label>
+        <div id="chkDadosLgpd" class="check-grid"></div>
+        <label style="margin-top:10px">Detalhamento dos campos (sem dados reais):
+          <input name="dadosTexto" placeholder="Ex: Nome, CPF, telefone, solicitações internas">
+        </label>
+        <label style="margin-top:10px">Cuidados de segurança que esta ferramenta possui:</label>
+        <div id="chkControles" class="check-grid"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>5. Integrações com Outros Sistemas</legend>
+        <label>Com quais sistemas esta ferramenta troca dados automaticamente?</label>
+        <div id="chkIntegra" class="check-grid"></div>
+        <label style="margin-top:10px">Como os dados são sincronizados ou digitados?
+          <input name="troca" placeholder="Ex: Integração automática ou Redigitação manual">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>6. Contrato e Fornecedor</legend>
+        <div class="fg">
+          <label>Fornecedor<input name="fornecedor" list="forns"></label>
+          <label>Nº do Contrato<input name="contrato"></label>
+          <label>Valor do Contrato (R$)<input name="cValor" type="number" min="0" step="0.01" value="0"></label>
+          <label>Início<input name="inicio" type="date"></label>
+          <label>Vencimento<input name="venc" type="date"></label>
+        </div>
+      </fieldset>
+
+      <datalist id="cats"></datalist>
+      <datalist id="setores"></datalist>
+      <datalist id="forns"></datalist>
+
+      <div id="liveTcoBox" class="live-tco-bar" aria-live="polite">
+        <span>Resumo de Custo Anual (TCO) calculado ao vivo:</span>
+        <div>
+          <b id="liveTcoVal">R$ 0,00 / ano</b>
+          <small id="liveTcoHrs" style="display:block;color:var(--tx-sec);font-size:0.8rem">0h/ano de retrabalho manual</small>
+        </div>
+      </div>
+
+      <div class="act">
+        <button type="button" id="cancel">Cancelar</button>
+        <button class="p" type="submit">Salvar no Catálogo</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- MODAL: CRIAR PLANO DE CONSOLIDAÇÃO -->
+  <dialog id="dlgPlano">
+    <form id="frmPlano" method="dialog">
+      <div class="modal-head">
+        <h2 style="margin:0;font-size:1.2rem">Aprovar Plano de Unificação</h2>
+        <button type="button" class="modal-close" onclick="this.closest('dialog').close()" aria-label="Fechar janela"><i class="ph-duotone ph-x"></i></button>
+      </div>
+      <p id="plResumo" style="font-weight:700;color:var(--ac);margin:0 0 14px"></p>
+      <input type="hidden" id="plOrigId">
+      <input type="hidden" id="plDestId">
+      <div class="fg">
+        <label>Responsáveis pela Migração<input id="plResp" required></label>
+        <label>Prazo Limite para Desligar a Cópia<input id="plPrazo" type="date" required></label>
+      </div>
+      <label style="margin-top:12px">Benefício esperado (Redução de retrabalho, economia e LGPD)
+        <textarea id="plJust" rows="3" required></textarea>
+      </label>
+      <div class="act">
+        <button type="button" onclick="this.closest('dialog').close()">Cancelar</button>
+        <button type="submit" class="p">Confirmar Plano de Unificação</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- MODAL: DETALHES -->
+  <dialog id="det"></dialog>
+
+  <!-- MODAL: EXCLUIR -->
+  <dialog id="del">
+    <form method="dialog">
+      <h2 style="margin:0 0 10px;font-size:1.2rem">Confirmar Exclusão</h2>
+      <p>Deseja excluir <b id="delNome"></b> do catálogo? A exclusão ficará registrada no histórico.</p>
+      <div class="act">
+        <button type="button" id="delNo">Cancelar</button>
+        <button class="p" type="button" id="delYes" style="background:var(--er);border-color:var(--er)">Sim, excluir</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- MODAL: CRIAR / EDITAR USUÁRIO E SENHA (GESTOR DE TI) -->
+  <dialog id="dlgUser" style="width:min(520px,95vw)">
+    <form id="frmUser" method="dialog">
+      <div class="modal-head">
+        <div>
+          <h2 id="duTitle" style="margin:0 0 4px;font-size:1.2rem">Novo Usuário</h2>
+          <p style="margin:0;color:var(--mu);font-size:0.86rem">Crie uma conta, atualize o setor ou redefina a senha do usuário.</p>
+        </div>
+        <button type="button" class="modal-close" onclick="this.closest('dialog').close()" aria-label="Fechar janela"><i class="ph-duotone ph-x"></i></button>
+      </div>
+      <div class="fg" style="margin-top:12px">
+        <label>Nome completo *<input name="nome" id="uNome" required></label>
+        <label>E-mail institucional *<input name="email" id="uEmail" type="email" required></label>
+        <label>Setor *<input name="setor" id="uSetor" list="setores" required></label>
+        <label>Nível de Acesso (Perfil)
+          <select name="perfil" id="uPerfil">
+            <option>Responsável pelo sistema</option>
+            <option>Setor financeiro</option>
+            <option>Administração</option>
+            <option>Gestor de TI</option>
+          </select>
+        </label>
+        <label>Status da Conta
+          <select name="status" id="uStatus">
+            <option value="ativo">Ativo</option>
+            <option value="pendente">Pendente</option>
+            <option value="bloqueado">Bloqueado</option>
+          </select>
+        </label>
+        <label><span id="uSenhaLabel">Senha (mín. 6 caracteres)</span>
+          <input name="senha" id="uSenha" type="password" minlength="6" placeholder="••••••••">
+        </label>
+      </div>
+      <div class="act">
+        <button type="button" onclick="this.closest('dialog').close()">Cancelar</button>
+        <button type="submit" class="p">Salvar Usuário</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- MODAL: LOGIN E CADASTRO DE CONTA -->
+  <dialog id="login">
+    <div style="margin-bottom:14px">
+      <h2 style="margin:0 0 4px;font-size:1.25rem">VIGIA-TI · Acesso Institucional</h2>
+      <p style="margin:0;color:var(--mu);font-size:0.86rem">Entre com sua conta ou solicite um novo acesso à área de TI.</p>
+    </div>
+
+    <div class="auth-tabs" role="tablist">
+      <button type="button" class="auth-tab active" id="tabBtnLogin" role="tab" aria-selected="true">Entrar</button>
+      <button type="button" class="auth-tab" id="tabBtnReg" role="tab" aria-selected="false">Solicitar Cadastro</button>
+    </div>
+
+    <!-- ABA ENTRAR -->
+    <form id="lf">
+      <label>E-mail institucional
+        <input name="email" id="loginEmail" type="email" placeholder="seu.nome@vigiati.edu.br" value="victor@vigiati.edu.br" required>
+      </label>
+      <label style="margin-top:10px">Senha
+        <input name="senha" id="loginSenha" type="password" placeholder="••••••••" value="123456" required>
+      </label>
+      <div style="display:flex;justify-content:flex-end;margin-top:6px">
+        <button type="button" class="lk" id="btnForgotToggle" style="font-size:0.8rem;font-weight:500">Esqueci minha senha</button>
+      </div>
+      <div id="forgotBox" hidden style="margin-top:10px;padding:12px;border-radius:8px;background:var(--sf-alt);border:1px solid var(--bd)">
+        <small style="display:block;color:var(--tx-sec);margin-bottom:8px">Informe seu e-mail para notificar o Gestor de TI e solicitar uma nova senha:</small>
+        <div style="display:flex;gap:6px">
+          <input type="email" id="forgotEmail" placeholder="seu.nome@vigiati.edu.br">
+          <button type="button" class="sm p" id="btnSendForgot">Solicitar</button>
+        </div>
+        <small id="forgotMsg" style="display:block;margin-top:6px;color:var(--ok)" hidden></small>
+      </div>
+      <div id="loginMsg" class="auth-msg err" hidden></div>
+      <div class="act" style="margin-top:14px">
+        <button class="p" type="submit" style="width:100%">Entrar na Plataforma</button>
+      </div>
+
+      <div class="demo-accounts">
+        <small style="color:var(--mu);font-weight:600">Acesso rápido de demonstração (senha padrão: 123456):</small>
+        <div class="demo-grid">
+          <button type="button" class="demo-btn" data-demo-email="victor@vigiati.edu.br">
+            <div><b>Victor Lima</b><span>Gestor de TI (Admin)</span></div>
+          </button>
+          <button type="button" class="demo-btn" data-demo-email="diretoria@vigiati.edu.br">
+            <div><b>Diretoria Acadêmica</b><span>Administração</span></div>
+          </button>
+          <button type="button" class="demo-btn" data-demo-email="carla@vigiati.edu.br">
+            <div><b>Carla Dias</b><span>Setor financeiro</span></div>
+          </button>
+          <button type="button" class="demo-btn" data-demo-email="marta@vigiati.edu.br">
+            <div><b>Marta Lima</b><span>Responsável (Secretaria)</span></div>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- ABA SOLICITAR CADASTRO -->
+    <form id="rf" hidden>
+      <label>Nome completo
+        <input name="nome" id="regNome" placeholder="Ex: João Silva" required>
+      </label>
+      <label style="margin-top:10px">E-mail institucional
+        <input name="email" id="regEmail" type="email" placeholder="joao@vigiati.edu.br" required>
+      </label>
+      <label style="margin-top:10px">Setor
+        <input name="setor" id="regSetor" placeholder="Ex: Secretaria, Coordenações, Extensão" required>
+      </label>
+      <div class="fg" style="margin-top:10px">
+        <label>Senha (mín. 6 caracteres)
+          <input name="senha" id="regSenha" type="password" minlength="6" required>
+        </label>
+        <label>Confirmar senha
+          <input name="senha2" id="regSenha2" type="password" minlength="6" required>
+        </label>
+      </div>
+      <small style="display:block;margin-top:10px;color:var(--mu)">
+        Por segurança e governança, novas contas ficam como <b>Pendente</b> até aprovação pelo Gestor de TI.
+      </small>
+      <div id="regMsg" class="auth-msg" hidden></div>
+      <div class="act" style="margin-top:16px">
+        <button class="p" type="submit" style="width:100%">Enviar Solicitação de Cadastro</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

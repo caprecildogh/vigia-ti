@@ -1,0 +1,12 @@
+{
+  "name": "vigia-ti",
+  "version": "1.0.0",
+  "description": "VIGIA-TI — Catálogo Integrado de Sistemas e Ativos de TI (Back-end Node.js + SQLite + Front-end)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}
